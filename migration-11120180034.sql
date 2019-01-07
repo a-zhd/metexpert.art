@@ -365,3 +365,20 @@ BEGIN;
 	);
 	DELETE FROM images WHERE title = 'DCIM_0057.jpg';
 COMMIT;
+BEGIN;
+	create or replace view additional_info_view_1 as
+	select 
+			profession,
+			sex,
+			year_birth,
+			count(*)
+		from additional_info
+		where 
+			profession is not null 
+			and 
+				sex is not null
+			and
+				year_birth is not null
+		group by profession, sex, year_birth
+		order by profession;
+COMMIT;
