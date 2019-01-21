@@ -30,8 +30,8 @@ CREATE TABLE IF NOT EXISTS parameter_values (
 
 CREATE TABLE IF NOT EXISTS additional_info (
 	id 			serial 		PRIMARY KEY,
-	start_time 	NUMERIC,
-	end_time 	NUMERIC,
+	start_time 	TIMESTAMP,
+	end_time 	TIMESTAMP,
 	sex 	    VARCHAR(1),
 	year_birth 	INTEGER,
 	education 	TEXT,
@@ -365,21 +365,3 @@ BEGIN;
 	--$$ LANGUAGE SQL;
 	
 COMMIT;
-BEGIN;
-	create or replace view additional_info_view_1 as
-	select 
-			profession,
-			sex,
-			year_birth,
-			count(*)
-		from additional_info
-		where 
-			profession is not null 
-			and 
-				sex is not null
-			and
-				year_birth is not null
-		group by profession, sex, year_birth
-		order by profession;
-COMMIT;
-
