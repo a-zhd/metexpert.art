@@ -22,9 +22,9 @@ CREATE TABLE IF NOT EXISTS registers (
 CREATE TABLE IF NOT EXISTS parameter_values (
     id 				SERIAL 		PRIMARY KEY,
     value 			NUMERIC 	NOT NULL,
-    test_id 		INTEGER 	REFERENCES registers(id),
-    parameter_id 	INTEGER 	REFERENCES parameters(id),
-    image_id 		INTEGER 	REFERENCES images(id),
+    test_id 		INTEGER 	REFERENCES registers(id) NOT NULL,
+    parameter_id 	INTEGER 	REFERENCES parameters(id) NOT NULL,
+    image_id 		INTEGER 	REFERENCES images(id) NOT NULL,
 	UNIQUE (test_id, parameter_id, image_id)
 );
 
@@ -54,7 +54,8 @@ CREATE TABLE student_values (
 	flexibility 		INTEGER		NOT NULL,
 	stroke_frequency 	INTEGER		NOT NULL,
 	gradation_tone 		INTEGER		NOT NULL,
-	contrast 			INTEGER		NOT NULL
+	contrast 			INTEGER		NOT NULL,
+	test_id				INTEGER 	REFERENCES registers(id)
 );
 
 INSERT INTO images (title, author) 
@@ -365,3 +366,5 @@ BEGIN;
 	--$$ LANGUAGE SQL;
 	
 COMMIT;
+
+
