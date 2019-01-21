@@ -3,6 +3,10 @@
 BEGIN;
 DROP TABLE cluster_analyzes;
 
+ALTER TABLE parameter_values ALTER COLUMN test_id SET NOT NULL;
+ALTER TABLE parameter_values ALTER COLUMN parameter_id SET NOT NULL;
+ALTER TABLE parameter_values ALTER COLUMN image_id SET NOT NULL;
+
 CREATE TABLE IF NOT EXISTS additional_info (
 	id 			serial 		PRIMARY KEY,
 	start_time 	TIMESTAMP,
