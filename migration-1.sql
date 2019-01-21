@@ -215,58 +215,6 @@ ALTER TABLE registers DROP COLUMN additional_info;
 
 DROP TABLE registers_images_join;
 
-CREATE OR REPLACE view all_values_view AS
-	SELECT
-		(pv.test_id + pv.parameter_id) AS id,
-		pv.test_id AS test_id,
-		ai.start_time::date AS start_date,
-		pv.value AS value,
-		pv.parameter_id AS parameter_id,
-		i.title AS image_title,
-		i.author AS author,
-		i.id AS image_id,
-		date_part('min', (ai.end_time - ai.start_time)) AS score_min,
-		ai.id AS add_info_id
-	FROM parameter_values pv
-	JOIN additional_info ai USING(test_id)
-	JOIN registers r ON ai.test_id = r.id
-	JOIN images i ON pv.image_id = i.id
-	WHERE r.test_finished IS TRUE;
-
-CREATE OR REPLACE VIEW diff_values_view AS
-	SELECT
-		MAX(image_title) AS image_title,
-		MAX(author) AS author,
-		MIN(p.title) AS parameter_title,
-		ARRAY_AGG(value) AS values,
-		ROUND(AVG(value), 3) AS diff_value,
-		MAX(score_min) AS score
-	FROM all_values_view v
-	JOIN parameters p ON p.id = v.parameter_id
-	GROUP BY image_id, parameter_id
-	ORDER BY image_id, parameter_id;
-
-CREATE OR REPLACE VIEW diff_values_view2 AS
-SELECT
-	title,
-	author,
-	val[1] AS pressure,
-	val[2] AS definition,
-	val[3] AS thickness,
-	val[4] AS flexibility,
-	val[5] AS stroke_frequency,
-	val[6] AS gradation_tone,
-	val[7] AS contrast
-FROM (
-	SELECT
-		image_title AS title,
-		MAX(author) as author,
-		ARRAY_AGG(diff_value) AS val
-	FROM diff_values_view
-	GROUP BY image_title
-	ORDER BY author
-) t;
-
 CREATE OR REPLACE FUNCTION create_quiz() RETURNS JSON AS $$
 	WITH image_rate AS (
 		WITH nils AS (
@@ -344,6 +292,59 @@ BEGIN
 	RETURN false;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE VIEW all_values_view AS
+	SELECT
+		(pv.test_id + pv.parameter_id) AS id,
+		pv.test_id AS test_id,
+		ai.start_time::date AS start_date,
+		pv.value AS value,
+		pv.parameter_id AS parameter_id,
+		i.title AS image_title,
+		i.author AS author,
+		i.id AS image_id,
+		date_part('min', (ai.end_time - ai.start_time)) AS score_min,
+		ai.id AS add_info_id
+	FROM parameter_values pv
+	JOIN additional_info ai USING(test_id)
+	JOIN registers r ON ai.test_id = r.id
+	JOIN images i ON pv.image_id = i.id
+	WHERE r.test_finished IS TRUE;
+
+CREATE OR REPLACE VIEW diff_values_view AS
+	SELECT
+		MAX(image_title) AS image_title,
+		MAX(author) AS author,
+		MIN(p.title) AS parameter_title,
+		ARRAY_AGG(value) AS values,
+		ROUND(AVG(value), 3) AS diff_value,
+		MAX(score_min) AS score
+	FROM all_values_view v
+	JOIN parameters p ON p.id = v.parameter_id
+	WHERE v.score_min >= 2
+	GROUP BY image_id, parameter_id
+	ORDER BY image_id, parameter_id;
+
+CREATE OR REPLACE VIEW diff_values_view2 AS
+SELECT
+	title,
+	author,
+	val[1] AS pressure,
+	val[2] AS definition,
+	val[3] AS thickness,
+	val[4] AS flexibility,
+	val[5] AS stroke_frequency,
+	val[6] AS gradation_tone,
+	val[7] AS contrast
+FROM (
+	SELECT
+		image_title AS title,
+		MAX(author) as author,
+		ARRAY_AGG(diff_value) AS val
+	FROM diff_values_view
+	GROUP BY image_title
+	ORDER BY author
+) t;
 
 CREATE OR REPLACE FUNCTION countReport() RETURNS JSON AS $$
 	SELECT ROW_TO_JSON(cn) FROM (
