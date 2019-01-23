@@ -3,6 +3,10 @@
 BEGIN;
 DROP TABLE cluster_analyzes;
 
+UPDATE images SET title = trim(replace(title, '.jpg', ''));
+UPDATE parameters SET pkey = 'stroke_frequency' WHERE pkey = 'stroke-frequency';
+UPDATE parameters SET pkey = 'gradation_tone' WHERE pkey = 'gradation-tone';
+
 ALTER TABLE parameter_values ALTER COLUMN test_id SET NOT NULL;
 ALTER TABLE parameter_values ALTER COLUMN parameter_id SET NOT NULL;
 ALTER TABLE parameter_values ALTER COLUMN image_id SET NOT NULL;
@@ -20,161 +24,161 @@ CREATE TABLE IF NOT EXISTS additional_info (
 );
 
 UPDATE parameter_values 
-	SET image_id = (SELECT id FROM images WHERE title = 'DCIM_0058.jpg')
+	SET image_id = (SELECT id FROM images WHERE title = 'DCIM_0058')
 	WHERE id IN (
 		SELECT pv.id FROM parameter_values pv
 			JOIN images i on pv.image_id = i.id
-			WHERE i.title = 'DCIM_0057.jpg');
+			WHERE i.title = 'DCIM_0057');
 DELETE FROM registers_images_join 
-	WHERE image_id in (SELECT id FROM images WHERE title = 'DCIM_0057.jpg');
-DELETE FROM images WHERE title = 'DCIM_0057.jpg';
+	WHERE image_id in (SELECT id FROM images WHERE title = 'DCIM_0057');
+DELETE FROM images WHERE title = 'DCIM_0057';
 
 ALTER TABLE images ADD COLUMN author text NOT NULL DEFAULT '';
-UPDATE images SET author = 'Анна К.'  WHERE title = 'DCIM_0093.jpg';
-UPDATE images SET author = 'Анна К.'  WHERE title = 'DCIM_0092.jpg';
-UPDATE images SET author = 'Анна К.'  WHERE title = 'DCIM_0091.jpg';
-UPDATE images SET author = 'Анна К.'  WHERE title = 'DCIM_0090.jpg';
-UPDATE images SET author = 'Анна К.'  WHERE title = 'DCIM_0089.jpg';
-UPDATE images SET author = 'Анна К.'  WHERE title = 'DCIM_0088.jpg';
-UPDATE images SET author = 'Анна К.'  WHERE title = 'DCIM_0087.jpg';
-UPDATE images SET author = 'Анна К.'  WHERE title = 'DCIM_0086.jpg';
-UPDATE images SET author = 'Елена Б.'  WHERE title = 'DCIM_0134.jpg';
-UPDATE images SET author = 'Елена Б.'  WHERE title = 'DCIM_0135.jpg';
-UPDATE images SET author = 'Елена Б.'  WHERE title = 'DCIM_0136.jpg';
-UPDATE images SET author = 'Елена Б.'  WHERE title = 'DCIM_0137.jpg';
-UPDATE images SET author = 'Елена Б.'  WHERE title = 'DCIM_0138.jpg';
-UPDATE images SET author = 'Елена Б.'  WHERE title = 'DCIM_0139.jpg';
-UPDATE images SET author = 'Валерия Б.'  WHERE title = 'DCIM_0128.jpg';
-UPDATE images SET author = 'Валерия Б.'  WHERE title = 'DCIM_0129.jpg';
-UPDATE images SET author = 'Валерия Б.'  WHERE title = 'DCIM_0130.jpg';
-UPDATE images SET author = 'Валерия Б.'  WHERE title = 'DCIM_0131.jpg';
-UPDATE images SET author = 'Валерия Б.'  WHERE title = 'DCIM_0132.jpg';
-UPDATE images SET author = 'Валерия Б.'  WHERE title = 'DCIM_0133.jpg';
-UPDATE images SET author = 'Мария В.'  WHERE title = 'DCIM_0115.jpg';
-UPDATE images SET author = 'Мария В.'  WHERE title = 'DCIM_0116.jpg';
-UPDATE images SET author = 'Мария В.'  WHERE title = 'DCIM_0117.jpg';
-UPDATE images SET author = 'Мария В.'  WHERE title = 'DCIM_0118.jpg';
-UPDATE images SET author = 'Мария В.'  WHERE title = 'DCIM_0119.jpg';
-UPDATE images SET author = 'Мария В.'  WHERE title = 'DCIM_0120.jpg';
-UPDATE images SET author = 'Мария В.'  WHERE title = 'DCIM_0085.jpg';
-UPDATE images SET author = 'Мария В.'  WHERE title = 'DCIM_0084.jpg';
-UPDATE images SET author = 'Мария В.'  WHERE title = 'DCIM_0083.jpg';
-UPDATE images SET author = 'Мария В.'  WHERE title = 'DCIM_0082.jpg';
-UPDATE images SET author = 'Мария В.'  WHERE title = 'DCIM_0081.jpg';
-UPDATE images SET author = 'Мария В.'  WHERE title = 'DCIM_0080.jpg';
-UPDATE images SET author = 'Елена Г.'  WHERE title = 'DCIM_0074.jpg';
-UPDATE images SET author = 'Елена Г.'  WHERE title = 'DCIM_0073.jpg';
-UPDATE images SET author = 'Елена Г.'  WHERE title = 'DCIM_0072.jpg';
-UPDATE images SET author = 'Елена Г.'  WHERE title = 'DCIM_0071.jpg';
-UPDATE images SET author = 'Елена Г.'  WHERE title = 'DCIM_0070.jpg';
-UPDATE images SET author = 'Елена Г.'  WHERE title = 'DCIM_0069.jpg';
-UPDATE images SET author = 'Елена Г.'  WHERE title = 'DCIM_0008.jpg';
-UPDATE images SET author = 'Елена Г.'  WHERE title = 'DCIM_0011.jpg';
-UPDATE images SET author = 'Женя Г.'  WHERE title = 'DCIM_0109.jpg';
-UPDATE images SET author = 'Женя Г.'  WHERE title = 'DCIM_0110.jpg';
-UPDATE images SET author = 'Женя Г.'  WHERE title = 'DCIM_0111.jpg';
-UPDATE images SET author = 'Женя Г.'  WHERE title = 'DCIM_0112.jpg';
-UPDATE images SET author = 'Женя Г.'  WHERE title = 'DCIM_0113.jpg';
-UPDATE images SET author = 'Женя Г.'  WHERE title = 'DCIM_0114.jpg';
-UPDATE images SET author = 'Женя Г.'  WHERE title = 'DCIM_0094.jpg';
-UPDATE images SET author = 'Женя Г.'  WHERE title = 'DCIM_0043.jpg';
-UPDATE images SET author = 'Марианна Е.'  WHERE title = 'DCIM_0140.jpg';
-UPDATE images SET author = 'Марианна Е.'  WHERE title = 'DCIM_0141.jpg';
-UPDATE images SET author = 'Марианна Е.'  WHERE title = 'DCIM_0142.jpg';
-UPDATE images SET author = 'Марианна Е.'  WHERE title = 'DCIM_0143.jpg';
-UPDATE images SET author = 'Марианна Е.'  WHERE title = 'DCIM_0144.jpg';
-UPDATE images SET author = 'Марианна Е.'  WHERE title = 'DCIM_0145.jpg';
-UPDATE images SET author = 'Татьяна З.'  WHERE title = 'DCIM_0042.jpg';
-UPDATE images SET author = 'Татьяна З.'  WHERE title = 'DCIM_0146.jpg';
-UPDATE images SET author = 'Татьяна З.'  WHERE title = 'DCIM_0147.jpg';
-UPDATE images SET author = 'Татьяна З.'  WHERE title = 'DCIM_0148.jpg';
-UPDATE images SET author = 'Татьяна З.'  WHERE title = 'DCIM_0149.jpg';
-UPDATE images SET author = 'Татьяна З.'  WHERE title = 'DCIM_0150.jpg';
-UPDATE images SET author = 'Татьяна З.'  WHERE title = 'DCIM_0151.jpg';
-UPDATE images SET author = 'Татьяна З.'  WHERE title = 'DCIM_0041.jpg';
-UPDATE images SET author = 'Татьяна З.'  WHERE title = 'DCIM_0040.jpg';
-UPDATE images SET author = 'Татьяна З.'  WHERE title = 'DCIM_0039.jpg';
-UPDATE images SET author = 'Татьяна З.'  WHERE title = 'DCIM_0038.jpg';
-UPDATE images SET author = 'Татьяна З.'  WHERE title = 'DCIM_0037.jpg';
-UPDATE images SET author = 'Надежда З.'  WHERE title = 'DCIM_0068.jpg';
-UPDATE images SET author = 'Надежда З.'  WHERE title = 'DCIM_0067.jpg';
-UPDATE images SET author = 'Надежда З.'  WHERE title = 'DCIM_0066.jpg';
-UPDATE images SET author = 'Надежда З.'  WHERE title = 'DCIM_0065.jpg';
-UPDATE images SET author = 'Надежда З.'  WHERE title = 'DCIM_0064.jpg';
-UPDATE images SET author = 'Надежда З.'  WHERE title = 'DCIM_0063.jpg';
-UPDATE images SET author = 'Надежда З.'  WHERE title = 'DCIM_0062.jpg';
-UPDATE images SET author = 'Дмитрий К.'  WHERE title = 'DCIM_0061.jpg';
-UPDATE images SET author = 'Дмитрий К.'  WHERE title = 'DCIM_0060.jpg';
-UPDATE images SET author = 'Дмитрий К.'  WHERE title = 'DCIM_0059.jpg';
-UPDATE images SET author = 'Дмитрий К.'  WHERE title = 'DCIM_0058.jpg';
-UPDATE images SET author = 'Дмитрий К.'  WHERE title = 'DCIM_0056.jpg';
-UPDATE images SET author = 'Дмитрий К.'  WHERE title = 'DCIM_0055.jpg';
-UPDATE images SET author = 'Дмитрий К.'  WHERE title = 'DCIM_0054.jpg';
-UPDATE images SET author = 'Дмитрий К.'  WHERE title = 'DCIM_0053.jpg';
-UPDATE images SET author = 'Дмитрий К.'  WHERE title = 'DCIM_0052.jpg';
-UPDATE images SET author = 'Дмитрий К.'  WHERE title = 'DCIM_0051.jpg';
-UPDATE images SET author = 'Дмитрий К.'  WHERE title = 'DCIM_0050.jpg';
-UPDATE images SET author = 'Дмитрий К.'  WHERE title = 'DCIM_0049.jpg';
-UPDATE images SET author = 'Сергей Л.'  WHERE title = 'DCIM_0036.jpg';
-UPDATE images SET author = 'Сергей Л.'  WHERE title = 'DCIM_0035.jpg';
-UPDATE images SET author = 'Сергей Л.'  WHERE title = 'DCIM_0034.jpg';
-UPDATE images SET author = 'Сергей Л.'  WHERE title = 'DCIM_0033.jpg';
-UPDATE images SET author = 'Сергей Л.'  WHERE title = 'DCIM_0032.jpg';
-UPDATE images SET author = 'Сергей Л.'  WHERE title = 'DCIM_0031.jpg';
-UPDATE images SET author = 'Сергей Л.'  WHERE title = 'DCIM_0030.jpg';
-UPDATE images SET author = 'Сергей Л.'  WHERE title = 'DCIM_0029.jpg';
-UPDATE images SET author = 'Сергей Л.'  WHERE title = 'DCIM_0028.jpg';
-UPDATE images SET author = 'Сергей Л.'  WHERE title = 'DCIM_0027.jpg';
-UPDATE images SET author = 'Виктор О.'  WHERE title = 'DCIM_0012.jpg';
-UPDATE images SET author = 'Виктор О.'  WHERE title = 'DCIM_0014.jpg';
-UPDATE images SET author = 'Виктор О.'  WHERE title = 'DCIM_0015.jpg';
-UPDATE images SET author = 'Виктор О.'  WHERE title = 'DCIM_0016.jpg';
-UPDATE images SET author = 'Виктор О.'  WHERE title = 'DCIM_0017.jpg';
-UPDATE images SET author = 'Виктор О.'  WHERE title = 'DCIM_0018.jpg';
-UPDATE images SET author = 'Виктор О.'  WHERE title = 'DCIM_0019.jpg';
-UPDATE images SET author = 'Виктор О.'  WHERE title = 'DCIM_0020.jpg';
-UPDATE images SET author = 'Виктор О.'  WHERE title = 'DCIM_0021.jpg';
-UPDATE images SET author = 'Виктор О.'  WHERE title = 'DCIM_0023.jpg';
-UPDATE images SET author = 'Виктор О.'  WHERE title = 'DCIM_0022.jpg';
-UPDATE images SET author = 'Виктор О.'  WHERE title = 'DCIM_0096.jpg';
-UPDATE images SET author = 'Владимир Р.'  WHERE title = 'DCIM_0004.jpg';
-UPDATE images SET author = 'Владимир Р.'  WHERE title = 'DCIM_0025.jpg';
-UPDATE images SET author = 'Владимир Р.'  WHERE title = 'DCIM_0024.jpg';
-UPDATE images SET author = 'Владимир Р.'  WHERE title = 'DCIM_0026.jpg';
-UPDATE images SET author = 'Владимир Р.'  WHERE title = 'DCIM_0005.jpg';
-UPDATE images SET author = 'Владимир Р.'  WHERE title = 'DCIM_0006.jpg';
-UPDATE images SET author = 'Владимир Р.'  WHERE title = 'DCIM_0007.jpg';
-UPDATE images SET author = 'Владимир Р.'  WHERE title = 'DCIM_0009.jpg';
-UPDATE images SET author = 'Владимир Р.'  WHERE title = 'DCIM_0010.jpg';
-UPDATE images SET author = 'Любовь С.'  WHERE title = 'DCIM_0103.jpg';
-UPDATE images SET author = 'Любовь С.'  WHERE title = 'DCIM_0104.jpg';
-UPDATE images SET author = 'Любовь С.'  WHERE title = 'DCIM_0105.jpg';
-UPDATE images SET author = 'Любовь С.'  WHERE title = 'DCIM_0106.jpg';
-UPDATE images SET author = 'Любовь С.'  WHERE title = 'DCIM_0107.jpg';
-UPDATE images SET author = 'Любовь С.'  WHERE title = 'DCIM_0108.jpg';
-UPDATE images SET author = 'Виктория С.'  WHERE title = 'DCIM_0125.jpg';
-UPDATE images SET author = 'Виктория С.'  WHERE title = 'DCIM_0126.jpg';
-UPDATE images SET author = 'Виктория С.'  WHERE title = 'DCIM_0127.jpg';
-UPDATE images SET author = 'Виктория С.'  WHERE title = 'DCIM_0047.jpg';
-UPDATE images SET author = 'Виктория С.'  WHERE title = 'DCIM_0046.jpg';
-UPDATE images SET author = 'Виктория С.'  WHERE title = 'DCIM_0045.jpg';
-UPDATE images SET author = 'Виктория С.'  WHERE title = 'DCIM_0044.jpg';
-UPDATE images SET author = 'Виктор Ф.'  WHERE title = 'DCIM_0121.jpg';
-UPDATE images SET author = 'Виктор Ф.'  WHERE title = 'DCIM_0122.jpg';
-UPDATE images SET author = 'Виктор Ф.'  WHERE title = 'DCIM_0123.jpg';
-UPDATE images SET author = 'Виктор Ф.'  WHERE title = 'DCIM_0124.jpg';
-UPDATE images SET author = 'Виктор Ф.'  WHERE title = 'DCIM_0095.jpg';
-UPDATE images SET author = 'Виктор Ф.'  WHERE title = 'DCIM_0079.jpg';
-UPDATE images SET author = 'Виктор Ф.'  WHERE title = 'DCIM_0078.jpg';
-UPDATE images SET author = 'Виктор Ф.'  WHERE title = 'DCIM_0077.jpg';
-UPDATE images SET author = 'Виктор Ф.'  WHERE title = 'DCIM_0076.jpg';
-UPDATE images SET author = 'Виктор Ф.'  WHERE title = 'DCIM_0075.jpg';
-UPDATE images SET author = 'Лев X.' WHERE title = 'DCIM_0097.jpg';
-UPDATE images SET author = 'Лев X.' WHERE title = 'DCIM_0098.jpg';
-UPDATE images SET author = 'Лев X.' WHERE title = 'DCIM_0099.jpg';
-UPDATE images SET author = 'Лев X.' WHERE title = 'DCIM_0100.jpg';
-UPDATE images SET author = 'Лев X.' WHERE title = 'DCIM_0101.jpg';
-UPDATE images SET author = 'Лев X.' WHERE title = 'DCIM_0102.jpg';
+UPDATE images SET author = 'Анна К.'  WHERE title = 'DCIM_0093';
+UPDATE images SET author = 'Анна К.'  WHERE title = 'DCIM_0092';
+UPDATE images SET author = 'Анна К.'  WHERE title = 'DCIM_0091';
+UPDATE images SET author = 'Анна К.'  WHERE title = 'DCIM_0090';
+UPDATE images SET author = 'Анна К.'  WHERE title = 'DCIM_0089';
+UPDATE images SET author = 'Анна К.'  WHERE title = 'DCIM_0088';
+UPDATE images SET author = 'Анна К.'  WHERE title = 'DCIM_0087';
+UPDATE images SET author = 'Анна К.'  WHERE title = 'DCIM_0086';
+UPDATE images SET author = 'Елена Б.'  WHERE title = 'DCIM_0134';
+UPDATE images SET author = 'Елена Б.'  WHERE title = 'DCIM_0135';
+UPDATE images SET author = 'Елена Б.'  WHERE title = 'DCIM_0136';
+UPDATE images SET author = 'Елена Б.'  WHERE title = 'DCIM_0137';
+UPDATE images SET author = 'Елена Б.'  WHERE title = 'DCIM_0138';
+UPDATE images SET author = 'Елена Б.'  WHERE title = 'DCIM_0139';
+UPDATE images SET author = 'Валерия Б.'  WHERE title = 'DCIM_0128';
+UPDATE images SET author = 'Валерия Б.'  WHERE title = 'DCIM_0129';
+UPDATE images SET author = 'Валерия Б.'  WHERE title = 'DCIM_0130';
+UPDATE images SET author = 'Валерия Б.'  WHERE title = 'DCIM_0131';
+UPDATE images SET author = 'Валерия Б.'  WHERE title = 'DCIM_0132';
+UPDATE images SET author = 'Валерия Б.'  WHERE title = 'DCIM_0133';
+UPDATE images SET author = 'Мария В.'  WHERE title = 'DCIM_0115';
+UPDATE images SET author = 'Мария В.'  WHERE title = 'DCIM_0116';
+UPDATE images SET author = 'Мария В.'  WHERE title = 'DCIM_0117';
+UPDATE images SET author = 'Мария В.'  WHERE title = 'DCIM_0118';
+UPDATE images SET author = 'Мария В.'  WHERE title = 'DCIM_0119';
+UPDATE images SET author = 'Мария В.'  WHERE title = 'DCIM_0120';
+UPDATE images SET author = 'Мария В.'  WHERE title = 'DCIM_0085';
+UPDATE images SET author = 'Мария В.'  WHERE title = 'DCIM_0084';
+UPDATE images SET author = 'Мария В.'  WHERE title = 'DCIM_0083';
+UPDATE images SET author = 'Мария В.'  WHERE title = 'DCIM_0082';
+UPDATE images SET author = 'Мария В.'  WHERE title = 'DCIM_0081';
+UPDATE images SET author = 'Мария В.'  WHERE title = 'DCIM_0080';
+UPDATE images SET author = 'Елена Г.'  WHERE title = 'DCIM_0074';
+UPDATE images SET author = 'Елена Г.'  WHERE title = 'DCIM_0073';
+UPDATE images SET author = 'Елена Г.'  WHERE title = 'DCIM_0072';
+UPDATE images SET author = 'Елена Г.'  WHERE title = 'DCIM_0071';
+UPDATE images SET author = 'Елена Г.'  WHERE title = 'DCIM_0070';
+UPDATE images SET author = 'Елена Г.'  WHERE title = 'DCIM_0069';
+UPDATE images SET author = 'Елена Г.'  WHERE title = 'DCIM_0008';
+UPDATE images SET author = 'Елена Г.'  WHERE title = 'DCIM_0011';
+UPDATE images SET author = 'Женя Г.'  WHERE title = 'DCIM_0109';
+UPDATE images SET author = 'Женя Г.'  WHERE title = 'DCIM_0110';
+UPDATE images SET author = 'Женя Г.'  WHERE title = 'DCIM_0111';
+UPDATE images SET author = 'Женя Г.'  WHERE title = 'DCIM_0112';
+UPDATE images SET author = 'Женя Г.'  WHERE title = 'DCIM_0113';
+UPDATE images SET author = 'Женя Г.'  WHERE title = 'DCIM_0114';
+UPDATE images SET author = 'Женя Г.'  WHERE title = 'DCIM_0094';
+UPDATE images SET author = 'Женя Г.'  WHERE title = 'DCIM_0043';
+UPDATE images SET author = 'Марианна Е.'  WHERE title = 'DCIM_0140';
+UPDATE images SET author = 'Марианна Е.'  WHERE title = 'DCIM_0141';
+UPDATE images SET author = 'Марианна Е.'  WHERE title = 'DCIM_0142';
+UPDATE images SET author = 'Марианна Е.'  WHERE title = 'DCIM_0143';
+UPDATE images SET author = 'Марианна Е.'  WHERE title = 'DCIM_0144';
+UPDATE images SET author = 'Марианна Е.'  WHERE title = 'DCIM_0145';
+UPDATE images SET author = 'Татьяна З.'  WHERE title = 'DCIM_0042';
+UPDATE images SET author = 'Татьяна З.'  WHERE title = 'DCIM_0146';
+UPDATE images SET author = 'Татьяна З.'  WHERE title = 'DCIM_0147';
+UPDATE images SET author = 'Татьяна З.'  WHERE title = 'DCIM_0148';
+UPDATE images SET author = 'Татьяна З.'  WHERE title = 'DCIM_0149';
+UPDATE images SET author = 'Татьяна З.'  WHERE title = 'DCIM_0150';
+UPDATE images SET author = 'Татьяна З.'  WHERE title = 'DCIM_0151';
+UPDATE images SET author = 'Татьяна З.'  WHERE title = 'DCIM_0041';
+UPDATE images SET author = 'Татьяна З.'  WHERE title = 'DCIM_0040';
+UPDATE images SET author = 'Татьяна З.'  WHERE title = 'DCIM_0039';
+UPDATE images SET author = 'Татьяна З.'  WHERE title = 'DCIM_0038';
+UPDATE images SET author = 'Татьяна З.'  WHERE title = 'DCIM_0037';
+UPDATE images SET author = 'Надежда З.'  WHERE title = 'DCIM_0068';
+UPDATE images SET author = 'Надежда З.'  WHERE title = 'DCIM_0067';
+UPDATE images SET author = 'Надежда З.'  WHERE title = 'DCIM_0066';
+UPDATE images SET author = 'Надежда З.'  WHERE title = 'DCIM_0065';
+UPDATE images SET author = 'Надежда З.'  WHERE title = 'DCIM_0064';
+UPDATE images SET author = 'Надежда З.'  WHERE title = 'DCIM_0063';
+UPDATE images SET author = 'Надежда З.'  WHERE title = 'DCIM_0062';
+UPDATE images SET author = 'Дмитрий К.'  WHERE title = 'DCIM_0061';
+UPDATE images SET author = 'Дмитрий К.'  WHERE title = 'DCIM_0060';
+UPDATE images SET author = 'Дмитрий К.'  WHERE title = 'DCIM_0059';
+UPDATE images SET author = 'Дмитрий К.'  WHERE title = 'DCIM_0058';
+UPDATE images SET author = 'Дмитрий К.'  WHERE title = 'DCIM_0056';
+UPDATE images SET author = 'Дмитрий К.'  WHERE title = 'DCIM_0055';
+UPDATE images SET author = 'Дмитрий К.'  WHERE title = 'DCIM_0054';
+UPDATE images SET author = 'Дмитрий К.'  WHERE title = 'DCIM_0053';
+UPDATE images SET author = 'Дмитрий К.'  WHERE title = 'DCIM_0052';
+UPDATE images SET author = 'Дмитрий К.'  WHERE title = 'DCIM_0051';
+UPDATE images SET author = 'Дмитрий К.'  WHERE title = 'DCIM_0050';
+UPDATE images SET author = 'Дмитрий К.'  WHERE title = 'DCIM_0049';
+UPDATE images SET author = 'Сергей Л.'  WHERE title = 'DCIM_0036';
+UPDATE images SET author = 'Сергей Л.'  WHERE title = 'DCIM_0035';
+UPDATE images SET author = 'Сергей Л.'  WHERE title = 'DCIM_0034';
+UPDATE images SET author = 'Сергей Л.'  WHERE title = 'DCIM_0033';
+UPDATE images SET author = 'Сергей Л.'  WHERE title = 'DCIM_0032';
+UPDATE images SET author = 'Сергей Л.'  WHERE title = 'DCIM_0031';
+UPDATE images SET author = 'Сергей Л.'  WHERE title = 'DCIM_0030';
+UPDATE images SET author = 'Сергей Л.'  WHERE title = 'DCIM_0029';
+UPDATE images SET author = 'Сергей Л.'  WHERE title = 'DCIM_0028';
+UPDATE images SET author = 'Сергей Л.'  WHERE title = 'DCIM_0027';
+UPDATE images SET author = 'Виктор О.'  WHERE title = 'DCIM_0012';
+UPDATE images SET author = 'Виктор О.'  WHERE title = 'DCIM_0014';
+UPDATE images SET author = 'Виктор О.'  WHERE title = 'DCIM_0015';
+UPDATE images SET author = 'Виктор О.'  WHERE title = 'DCIM_0016';
+UPDATE images SET author = 'Виктор О.'  WHERE title = 'DCIM_0017';
+UPDATE images SET author = 'Виктор О.'  WHERE title = 'DCIM_0018';
+UPDATE images SET author = 'Виктор О.'  WHERE title = 'DCIM_0019';
+UPDATE images SET author = 'Виктор О.'  WHERE title = 'DCIM_0020';
+UPDATE images SET author = 'Виктор О.'  WHERE title = 'DCIM_0021';
+UPDATE images SET author = 'Виктор О.'  WHERE title = 'DCIM_0023';
+UPDATE images SET author = 'Виктор О.'  WHERE title = 'DCIM_0022';
+UPDATE images SET author = 'Виктор О.'  WHERE title = 'DCIM_0096';
+UPDATE images SET author = 'Владимир Р.'  WHERE title = 'DCIM_0004';
+UPDATE images SET author = 'Владимир Р.'  WHERE title = 'DCIM_0025';
+UPDATE images SET author = 'Владимир Р.'  WHERE title = 'DCIM_0024';
+UPDATE images SET author = 'Владимир Р.'  WHERE title = 'DCIM_0026';
+UPDATE images SET author = 'Владимир Р.'  WHERE title = 'DCIM_0005';
+UPDATE images SET author = 'Владимир Р.'  WHERE title = 'DCIM_0006';
+UPDATE images SET author = 'Владимир Р.'  WHERE title = 'DCIM_0007';
+UPDATE images SET author = 'Владимир Р.'  WHERE title = 'DCIM_0009';
+UPDATE images SET author = 'Владимир Р.'  WHERE title = 'DCIM_0010';
+UPDATE images SET author = 'Любовь С.'  WHERE title = 'DCIM_0103';
+UPDATE images SET author = 'Любовь С.'  WHERE title = 'DCIM_0104';
+UPDATE images SET author = 'Любовь С.'  WHERE title = 'DCIM_0105';
+UPDATE images SET author = 'Любовь С.'  WHERE title = 'DCIM_0106';
+UPDATE images SET author = 'Любовь С.'  WHERE title = 'DCIM_0107';
+UPDATE images SET author = 'Любовь С.'  WHERE title = 'DCIM_0108';
+UPDATE images SET author = 'Виктория С.'  WHERE title = 'DCIM_0125';
+UPDATE images SET author = 'Виктория С.'  WHERE title = 'DCIM_0126';
+UPDATE images SET author = 'Виктория С.'  WHERE title = 'DCIM_0127';
+UPDATE images SET author = 'Виктория С.'  WHERE title = 'DCIM_0047';
+UPDATE images SET author = 'Виктория С.'  WHERE title = 'DCIM_0046';
+UPDATE images SET author = 'Виктория С.'  WHERE title = 'DCIM_0045';
+UPDATE images SET author = 'Виктория С.'  WHERE title = 'DCIM_0044';
+UPDATE images SET author = 'Виктор Ф.'  WHERE title = 'DCIM_0121';
+UPDATE images SET author = 'Виктор Ф.'  WHERE title = 'DCIM_0122';
+UPDATE images SET author = 'Виктор Ф.'  WHERE title = 'DCIM_0123';
+UPDATE images SET author = 'Виктор Ф.'  WHERE title = 'DCIM_0124';
+UPDATE images SET author = 'Виктор Ф.'  WHERE title = 'DCIM_0095';
+UPDATE images SET author = 'Виктор Ф.'  WHERE title = 'DCIM_0079';
+UPDATE images SET author = 'Виктор Ф.'  WHERE title = 'DCIM_0078';
+UPDATE images SET author = 'Виктор Ф.'  WHERE title = 'DCIM_0077';
+UPDATE images SET author = 'Виктор Ф.'  WHERE title = 'DCIM_0076';
+UPDATE images SET author = 'Виктор Ф.'  WHERE title = 'DCIM_0075';
+UPDATE images SET author = 'Лев X.' WHERE title = 'DCIM_0097';
+UPDATE images SET author = 'Лев X.' WHERE title = 'DCIM_0098';
+UPDATE images SET author = 'Лев X.' WHERE title = 'DCIM_0099';
+UPDATE images SET author = 'Лев X.' WHERE title = 'DCIM_0100';
+UPDATE images SET author = 'Лев X.' WHERE title = 'DCIM_0101';
+UPDATE images SET author = 'Лев X.' WHERE title = 'DCIM_0102';
 
 ALTER TABLE parameter_values ADD UNIQUE (test_id, parameter_id, image_id);
 
@@ -194,18 +198,15 @@ INSERT INTO additional_info
 
 ALTER TABLE registers ADD COLUMN test_finished BOOLEAN;
 ALTER TABLE registers ADD COLUMN created_at DATE;
-ALTER TABLE registers ADD COLUMN img_titles TEXT[];
 
 UPDATE registers SET test_finished = additional_info IS NOT NULL;
 
 UPDATE registers
 SET
-	created_at = sq.ca,
-	img_titles = sq.imgs
+	created_at = sq.ca
 FROM 
 	(SELECT
 		registry_id as rid, 
-		array_agg(i.title) as imgs,
 		to_timestamp((max(r.additional_info)::json ->> 'start-time')::numeric / 1000)::date as ca
 	FROM 
 		registers_images_join rij
@@ -219,47 +220,74 @@ ALTER TABLE registers DROP COLUMN additional_info;
 
 DROP TABLE registers_images_join;
 
-CREATE OR REPLACE FUNCTION create_quiz() RETURNS JSON AS $$
-	WITH image_rate AS (
-		WITH nils AS (
-			SELECT i.id, i.title, 0 as rait FROM parameter_values pv
-			RIGHT JOIN images i ON i.id = pv.image_id
-			WHERE pv.value IS NULL
-		), maxvals AS (
-			SELECT i.id, MAX(i.title) as title, (COUNT(pv.value) * CASE WHEN SUM(pv.value)=0 THEN 1 ELSE 10 END) as rait
-			FROM parameter_values pv
-			RIGHT JOIN images i ON i.id = pv.image_id
-			WHERE pv.value IS NOT NULL
-			GROUP BY i.id
+	CREATE OR REPLACE FUNCTION get_quiz(testid INTEGER) RETURNS json AS $$
+		select row_to_json(ss)
+		from (
+			select 
+				test_id, json_agg(vals) as vls
+			from (
+				select 
+				pv.test_id as test_id, 
+				json_build_object(
+					'parameter_id', pv.parameter_id, 
+					'image_id',  pv.image_id, 
+					'img_title', i.title, 
+					'parameter_title', p.title, 
+					'parameter_pkey', p.pkey, 	
+					'parameter_value', pv.value, 
+					'parameter_min_img_title', imin.title, 
+					'parameter_max_img_title', imax.title) as vals
+			from registers r
+			join parameter_values pv on pv.test_id = r.id
+			join parameters p on p.id = pv.parameter_id
+			join images i on pv.image_id = i.id
+			join images imin on p.min_value = imin.id
+			join images imax on p.max_value = imax.id
+			where r.id = testid
+			) sub 
+			group by test_id
+		) ss;
+	$$ LANGUAGE sql;
+
+	CREATE OR REPLACE FUNCTION create_quiz() RETURNS JSON AS $$
+		WITH image_rate AS (
+			WITH nils AS (
+				SELECT i.id, i.title, 0 as rait FROM parameter_values pv
+				RIGHT JOIN images i ON i.id = pv.image_id
+				WHERE pv.value IS NULL
+			), maxvals AS (
+				SELECT i.id, MAX(i.title) as title, (COUNT(pv.value) * CASE WHEN SUM(pv.value)=0 THEN 1 ELSE 10 END) as rait
+				FROM parameter_values pv
+				RIGHT JOIN images i ON i.id = pv.image_id
+				WHERE pv.value IS NOT NULL
+				GROUP BY i.id
+			)
+			select * from nils
+			union 
+			select * from maxvals
+			ORDER BY rait
+			LIMIT 2
+		), quiz AS (
+			INSERT INTO registers (created_at, test_finished) values (NOW(), false) returning id
+		), insert_params_value AS (
+			INSERT INTO parameter_values (value, test_id, image_id, parameter_id) 
+			VALUES  (0, (SELECT id FROM quiz), (SELECT (array_agg(id))[1] FROM image_rate), 1),
+					(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[2] FROM image_rate), 1),
+					(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[1] FROM image_rate), 2),
+					(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[2] FROM image_rate), 2),
+					(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[1] FROM image_rate), 3),
+					(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[2] FROM image_rate), 3),
+					(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[1] FROM image_rate), 4),
+					(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[2] FROM image_rate), 4),
+					(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[1] FROM image_rate), 5),
+					(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[2] FROM image_rate), 5),
+					(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[1] FROM image_rate), 6),
+					(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[2] FROM image_rate), 6),
+					(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[1] FROM image_rate), 7),
+					(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[2] FROM image_rate), 7)																			 
 		)
-		select * from nils
-		union 
-		select * from maxvals
-		ORDER BY rait
-		LIMIT 2
-	), quiz AS (
-		INSERT INTO registers (created_at, img_titles, test_finished) 
-		SELECT NOW(), ARRAY_AGG(title), false FROM image_rate
-		returning id, img_titles
-	), insert_params_value AS (
-		INSERT INTO parameter_values (value, test_id, image_id, parameter_id) 
-		VALUES  (0, (SELECT id FROM quiz), (SELECT (array_agg(id))[1] FROM image_rate), 1),
-				(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[2] FROM image_rate), 1),
-				(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[1] FROM image_rate), 2),
-				(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[2] FROM image_rate), 2),
-				(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[1] FROM image_rate), 3),
-				(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[2] FROM image_rate), 3),
-				(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[1] FROM image_rate), 4),
-				(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[2] FROM image_rate), 4),
-				(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[1] FROM image_rate), 5),
-				(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[2] FROM image_rate), 5),
-				(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[1] FROM image_rate), 6),
-				(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[2] FROM image_rate), 6),
-				(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[1] FROM image_rate), 7),
-				(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[2] FROM image_rate), 7)																			 
-	)
-	SELECT ROW_TO_JSON(quiz) FROM  quiz;
-$$ LANGUAGE sql;
+		SELECT ROW_TO_JSON(quiz) FROM  quiz;
+	$$ LANGUAGE sql;
 
 CREATE OR REPLACE FUNCTION addValue(test_id INTEGER, image_id INTEGER, parameter_id INTEGER, value float) RETURNS BOOLEAN AS
 $$
