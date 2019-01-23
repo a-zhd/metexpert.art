@@ -2777,15 +2777,15 @@ INSERT INTO student_values (person_num,year_birth,profession,education,sex,img,p
 (15,4748,'Реклама / Полиграфия / СМИ','Высшее','m','DCIM_0056',63,89,23,0,0,0,0),
 (15,4749,'Реклама / Полиграфия / СМИ','Высшее','m','DCIM_0078',4,34,41,0,0,0,0);
 
-CREATE OR REPLACE FUNCTION loadStudentValues() RETURNS BOOLEAN AS
+CREATE OR REPLACE FUNCTION loadStudentValues() returns BIGINT AS
 $$
 declare
 	vls record;
 	tid integer;
 begin
 	for vls in select * from student_values loop
-		if (select count(*) from images where title = vls.img) > 0 then
-			begin			
+		if (select count(id) > 0 from images where title = vls.img) then	
+			begin
 				insert into registers (created_at, test_finished) values (make_date(2018, 1, 1), true);
 				tid := (select max(id) from registers);
 				update student_values set test_id = tid where id = vls.id;
@@ -2854,15 +2854,13 @@ begin
 						(select id from images where title = vls.img)
 					from student_values 
 					where id = vls.id;
-			end;
+				end;
 		end if;
 	end loop;
-	return true;
+	return (select count(*) from registers where created_at = '01-01-2018');
 END;
 $$ LANGUAGE plpgsql;
 
 SELECT loadStudentValues();
-
-DROP function loadStudentValues;
 
 COMMIT;
