@@ -33,6 +33,13 @@ DELETE FROM registers_images_join
 	WHERE image_id in (SELECT id FROM images WHERE title = 'DCIM_0057');
 DELETE FROM images WHERE title = 'DCIM_0057';
 
+DELETE FROM registers WHERE id IN (
+	SELECT r.id
+	FROM registers r
+	LEFT JOIN parameter_values pv on pv.test_id = r.id
+	WHERE pv.id IS NULL
+);
+
 ALTER TABLE images ADD COLUMN author text NOT NULL DEFAULT '';
 UPDATE images SET author = 'Анна К.'  WHERE title = 'DCIM_0093';
 UPDATE images SET author = 'Анна К.'  WHERE title = 'DCIM_0092';
@@ -196,8 +203,21 @@ INSERT INTO additional_info
 	FROM registers
 	WHERE additional_info IS NOT NULL;
 
+CREATE TABLE IF NOT EXISTS external_systems (
+	id			serial 	PRIMARY KEY,
+	key 		VARCHAR(5) 	NOT NULL,
+	UNIQUE (key)
+);
+
+INSERT INTO external_systems (key) VALUES ('web');
+
 ALTER TABLE registers ADD COLUMN test_finished BOOLEAN;
 ALTER TABLE registers ADD COLUMN created_at DATE;
+ALTER TABLE registers ADD COLUMN ex_system INTEGER;
+ALTER TABLE registers ADD FOREIGN KEY (ex_system) REFERENCES external_systems(id);
+
+UPDATE registers SET ex_system = (SELECT id FROM external_systems WHERE key = 'web');
+ALTER TABLE registers ALTER COLUMN ex_system SET NOT NULL;
 
 UPDATE registers SET test_finished = additional_info IS NOT NULL;
 
@@ -220,76 +240,82 @@ ALTER TABLE registers DROP COLUMN additional_info;
 
 DROP TABLE registers_images_join;
 
-	CREATE OR REPLACE FUNCTION get_quiz(testid INTEGER) RETURNS json AS $$
-		select row_to_json(ss)
+--return quiz if not finished by syscode and test_id, else error
+CREATE OR REPLACE FUNCTION get_quiz(testid INTEGER, syscode VARCHAR) RETURNS json AS $$
+	select row_to_json(ss)
+	from (
+		select 
+			test_id, json_agg(vals) as vls
 		from (
 			select 
-				test_id, json_agg(vals) as vls
-			from (
-				select 
-				pv.test_id as test_id, 
-				json_build_object(
-					'parameter_id', pv.parameter_id, 
-					'image_id',  pv.image_id, 
-					'img_title', i.title, 
-					'parameter_title', p.title, 
-					'parameter_pkey', p.pkey, 	
-					'parameter_value', pv.value, 
-					'parameter_min_img_title', imin.title, 
-					'parameter_max_img_title', imax.title) as vals
-			from registers r
-			join parameter_values pv on pv.test_id = r.id
-			join parameters p on p.id = pv.parameter_id
-			join images i on pv.image_id = i.id
-			join images imin on p.min_value = imin.id
-			join images imax on p.max_value = imax.id
-			where r.id = testid
-			) sub 
-			group by test_id
-		) ss;
-	$$ LANGUAGE sql;
+			pv.test_id as test_id, 
+			json_build_object(
+				'parameter_id', pv.parameter_id, 
+				'image_id',  pv.image_id, 
+				'img_title', i.title, 
+				'parameter_title', p.title, 
+				'parameter_pkey', p.pkey, 	
+				'parameter_value', pv.value, 
+				'parameter_min_img_title', imin.title, 
+				'parameter_max_img_title', imax.title) as vals
+		from registers r
+		join parameter_values pv on pv.test_id = r.id
+		join parameters p on p.id = pv.parameter_id
+		join images i on pv.image_id = i.id
+		join images imin on p.min_value = imin.id
+		join images imax on p.max_value = imax.id
+		where r.id = testid 
+			and r.ex_system = (select id from external_systems where key = syscode)
+			and test_finished = false
+		) sub 
+		group by test_id
+	) ss;
+$$ LANGUAGE sql;
 
-	CREATE OR REPLACE FUNCTION create_quiz() RETURNS JSON AS $$
-		WITH image_rate AS (
-			WITH nils AS (
-				SELECT i.id, i.title, 0 as rait FROM parameter_values pv
-				RIGHT JOIN images i ON i.id = pv.image_id
-				WHERE pv.value IS NULL
-			), maxvals AS (
-				SELECT i.id, MAX(i.title) as title, (COUNT(pv.value) * CASE WHEN SUM(pv.value)=0 THEN 1 ELSE 10 END) as rait
-				FROM parameter_values pv
-				RIGHT JOIN images i ON i.id = pv.image_id
-				WHERE pv.value IS NOT NULL
-				GROUP BY i.id
-			)
-			select * from nils
-			union 
-			select * from maxvals
-			ORDER BY rait
-			LIMIT 2
-		), quiz AS (
-			INSERT INTO registers (created_at, test_finished) values (NOW(), false) returning id
-		), insert_params_value AS (
-			INSERT INTO parameter_values (value, test_id, image_id, parameter_id) 
-			VALUES  (0, (SELECT id FROM quiz), (SELECT (array_agg(id))[1] FROM image_rate), 1),
-					(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[2] FROM image_rate), 1),
-					(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[1] FROM image_rate), 2),
-					(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[2] FROM image_rate), 2),
-					(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[1] FROM image_rate), 3),
-					(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[2] FROM image_rate), 3),
-					(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[1] FROM image_rate), 4),
-					(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[2] FROM image_rate), 4),
-					(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[1] FROM image_rate), 5),
-					(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[2] FROM image_rate), 5),
-					(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[1] FROM image_rate), 6),
-					(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[2] FROM image_rate), 6),
-					(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[1] FROM image_rate), 7),
-					(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[2] FROM image_rate), 7)																			 
+--create new quiz only with syscode, else error
+CREATE OR REPLACE FUNCTION create_quiz(syscode VARCHAR) RETURNS JSON AS $$
+	WITH image_rate AS (
+		WITH nils AS (
+			SELECT i.id, i.title, 0 as rait FROM parameter_values pv
+			RIGHT JOIN images i ON i.id = pv.image_id
+			WHERE pv.value IS NULL
+		), maxvals AS (
+			SELECT i.id, MAX(i.title) as title, (COUNT(pv.value) * CASE WHEN SUM(pv.value)=0 THEN 1 ELSE 10 END) as rait
+			FROM parameter_values pv
+			RIGHT JOIN images i ON i.id = pv.image_id
+			WHERE pv.value IS NOT NULL
+			GROUP BY i.id
 		)
-		SELECT ROW_TO_JSON(quiz) FROM  quiz;
-	$$ LANGUAGE sql;
+		select * from nils
+		union 
+		select * from maxvals
+		ORDER BY rait
+		LIMIT 2
+	), quiz AS (
+		INSERT INTO registers (created_at, test_finished, ex_system) 
+			values (NOW(), false, (select id from external_systems where key = syscode)) returning id
+	), insert_params_value AS (
+		INSERT INTO parameter_values (value, test_id, image_id, parameter_id) 
+		VALUES  (0, (SELECT id FROM quiz), (SELECT (array_agg(id))[1] FROM image_rate), 1),
+				(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[2] FROM image_rate), 1),
+				(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[1] FROM image_rate), 2),
+				(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[2] FROM image_rate), 2),
+				(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[1] FROM image_rate), 3),
+				(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[2] FROM image_rate), 3),
+				(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[1] FROM image_rate), 4),
+				(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[2] FROM image_rate), 4),
+				(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[1] FROM image_rate), 5),
+				(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[2] FROM image_rate), 5),
+				(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[1] FROM image_rate), 6),
+				(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[2] FROM image_rate), 6),
+				(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[1] FROM image_rate), 7),
+				(0, (SELECT id FROM quiz), (SELECT (array_agg(id))[2] FROM image_rate), 7)																			 
+	)
+	SELECT ROW_TO_JSON(quiz) FROM  quiz;
+$$ LANGUAGE sql;
 
-CREATE OR REPLACE FUNCTION addValue(test_id INTEGER, image_id INTEGER, parameter_id INTEGER, value float) RETURNS BOOLEAN AS
+--add value only quiz is not finished and match with other arguments
+CREATE OR REPLACE FUNCTION addValue(syscode VARCHAR, test_id INTEGER, image_id INTEGER, parameter_id INTEGER, value float) RETURNS BOOLEAN AS
 $$
 BEGIN
 		INSERT INTO parameter_values (value, test_id, parameter_id, image_id)
@@ -301,7 +327,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION finish(testid INTEGER) RETURNS BOOLEAN AS
+--only if match with arguments and quiz is not finished
+CREATE OR REPLACE FUNCTION finish(testid INTEGER, syscode VARCHAR) RETURNS BOOLEAN AS
 $$
 DECLARE full_fill boolean;
 		test_not_exists boolean;
@@ -325,6 +352,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- add syscode in input
 CREATE OR REPLACE VIEW all_values_view AS
 	SELECT
 		(pv.test_id + pv.parameter_id) AS id,
@@ -343,6 +371,7 @@ CREATE OR REPLACE VIEW all_values_view AS
 	JOIN images i ON pv.image_id = i.id
 	WHERE r.test_finished IS TRUE;
 
+--if syscode = 'ml' not considering score
 CREATE OR REPLACE VIEW diff_values_view AS
 	SELECT
 		MAX(image_title) AS image_title,
@@ -378,6 +407,7 @@ FROM (
 	ORDER BY author
 ) t;
 
+--add count with syscode
 CREATE OR REPLACE FUNCTION countReport() RETURNS JSON AS $$
 	SELECT ROW_TO_JSON(cn) FROM (
 		SELECT (ARRAY_AGG(count))[1] AS not_finished, (ARRAY_AGG(count))[2] AS finished FROM (
@@ -393,8 +423,17 @@ $$ LANGUAGE sql;
 CREATE OR REPLACE FUNCTION allRowReport() RETURNS JSON AS $$
 	SELECT ARRAY_TO_JSON(ARRAY_AGG(all_values_view)) FROM all_values_view;
 $$ LANGUAGE sql;
+		
+				       --!!
+CREATE OR REPLACE FUNCTION allRowReport(syscode VARCHAR) RETURNS JSON AS $$
+	SELECT ARRAY_TO_JSON(ARRAY_AGG(all_values_view)) FROM all_values_view;
+$$ LANGUAGE sql;				      
 
 CREATE OR REPLACE FUNCTION diffValuesReport() RETURNS JSON AS $$
+	SELECT ARRAY_TO_JSON(ARRAY_AGG(diff_values_view2)) FROM diff_values_view2;
+$$ LANGUAGE sql;
+				       --!!
+CREATE OR REPLACE FUNCTION diffValuesReport(syscode VARCHAR) RETURNS JSON AS $$
 	SELECT ARRAY_TO_JSON(ARRAY_AGG(diff_values_view2)) FROM diff_values_view2;
 $$ LANGUAGE sql;
 
