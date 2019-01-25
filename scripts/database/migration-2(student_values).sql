@@ -2,6 +2,8 @@
 
 BEGIN;
 
+INSERT INTO external_systems (key) VALUES ('student');
+
 CREATE TABLE student_values (
 	id					serial		PRIMARY KEY, 
 	person_num			INTEGER 	NOT NULL,
@@ -2786,7 +2788,7 @@ begin
 	for vls in select * from student_values loop
 		if (select count(id) > 0 from images where title = vls.img) then	
 			begin
-				insert into registers (created_at, test_finished) values (make_date(2018, 1, 1), true);
+				insert into registers (created_at, test_finished, external_systems) values (make_date(2018, 1, 1), true, (SELECT id FROM external_systems WHERE key = 'student'));
 				tid := (select max(id) from registers);
 				update student_values set test_id = tid where id = vls.id;
 				insert into additional_info (year_birth, sex, education, profession, raw_data, start_time, end_time) 
