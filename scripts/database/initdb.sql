@@ -57,6 +57,14 @@ CREATE TABLE student_values (
 	test_id				INTEGER 	REFERENCES registers(id)
 );
 
+CREATE TABLE IF NOT EXISTS external_systems (
+	id			serial 	PRIMARY KEY,
+	key 		VARCHAR(5) 	NOT NULL,
+	UNIQUE (key)
+);
+
+INSERT INTO external_systems (key) VALUES ('web');
+
 INSERT INTO images (title, author) 
 VALUES 	('DCIM_0093',	'Анна К.'),
 		('DCIM_0092',	'Анна К.'),
@@ -388,3 +396,5 @@ BEGIN;
 	$$ LANGUAGE sql;
 	
 COMMIT;
+
+
