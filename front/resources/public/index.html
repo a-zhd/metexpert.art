@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link href="css/style.css" rel="stylesheet" type="text/css">
+
+        <!--<link rel="icon" href="https://clojurescript.org/images/cljs-logo-icon-32.png">-->
+
+        <!--Bootsrap CSS-->
+        <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+        <!--JQuery-->
+        <script src="vendor/jquery/js/jquery-3.3.1.min.js" type="text/javascript"></script>
+
+        <script>
+            base_url = "";
+            image_base_url = "";
+            $.getJSON('config.json', function(data) {
+                console.log(data);
+                base_url = data.base_url;
+                image_base_url = data.image_base_url;about = base_url + "/about";
+            });
+        </script>
+  </head>
+  <body>
+    <div class="spinner" id="spinner">
+        <div class="double-bounce1"></div>
+        <div class="double-bounce2"></div>
+    </div>
+    <div id="app"></div>
+    <script src="js/compiled/surveyone.js" type="text/javascript"></script>
+  </body>
+</html>
